@@ -144,7 +144,8 @@ class ReadController extends SpreadsheetController
                         } else {
                             if (!empty($value)) {
                                 $map = false;
-                                if ($name == $address ) {
+
+                                if ($name == strtolower($address) ) {
 
                                     $geo = $this->geoService->getGeo($value);
 
