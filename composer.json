@@ -23,7 +23,8 @@
         "zendframework/zendgdata": "~2.0.1",
         "appshed/extension-api": "~2.0.2",
         "guzzlehttp/guzzle": "~5.0",
-        "guzzlehttp/log-subscriber": "~1.0"
+        "guzzlehttp/log-subscriber": "~1.0",
+        "guzzlehttp/cache-subscriber": "0.1.0"
     },
     "scripts": {
         "post-install-cmd": [
