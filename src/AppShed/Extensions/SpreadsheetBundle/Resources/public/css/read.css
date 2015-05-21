@@ -97,3 +97,8 @@ div.errors {
     text-align: center;
     padding-top: 140px;
 }
+
+input[type=text] {
+    height: 30px;
+    width: 100%;
+}
