@@ -112,8 +112,8 @@
                 <div>You must set the settings to 'Anyone who has the link can view' on Google Drive</div>
 
                 <br/>
-                <div>If you want to add an address pin on the map, please indicate the name of a column below</div>
-                <input name="address" type="text" value="{{ doc.address }}"/>
+                <div>You can display the address entered in the Google Sheet as the pin on the map, instead on only showing it as text. Please enter the title of the column that contains the address info below:</div>
+                <input name="address" placeholder="Column Title" type="text" value="{{ doc.address }}"/>
 
             </div>
             <div class="buttons">

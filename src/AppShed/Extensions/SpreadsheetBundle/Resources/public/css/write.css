@@ -64,3 +64,8 @@ div.errors {
     text-align: center;
     color: red;
 }
+
+input[type=text] {
+    height: 30px;
+    width: 100%;
+}
