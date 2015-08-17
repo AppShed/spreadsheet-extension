@@ -20,7 +20,6 @@
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
         "symfony/finder": "2.3.*",
-        "zendframework/zendgdata": "~2.0.1",
         "appshed/extension-api": "~2.0.2",
         "guzzlehttp/guzzle": "~5.0",
         "guzzlehttp/log-subscriber": "~1.0",

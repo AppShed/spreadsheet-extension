@@ -15,7 +15,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppShed\Extensions\SpreadsheetBundle\Entity\Doc;
-use ZendGData\Spreadsheets\ListQuery;
 
 /**
  * @Route("/spreadsheet/read", service="app_shed_extensions_spreadsheet.controller.read")
@@ -208,11 +207,13 @@ class ReadController extends SpreadsheetController
 
     private function getDocument($key, $filter = null)
     {
-        $query = new ListQuery();
-        $query->setSpreadsheetKey($key);
-        if ($filter) {
-            $query->setSpreadsheetQuery($filter);
-        }
+//        $query = new ListQuery();
+//        $query->setSpreadsheetKey($key);
+//        if ($filter) {
+//            $query->setSpreadsheetQuery($filter);
+//        }
+
+        // need to test it where is used
 
         $listFeed = $this->getSpreadsheets()->getSpreadsheetById($key);
 

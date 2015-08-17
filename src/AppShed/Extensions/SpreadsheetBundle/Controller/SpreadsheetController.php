@@ -10,14 +10,13 @@ use Google_Auth_AssertionCredentials;
 use Google_Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use ZendGData\Spreadsheets;
 use Google\Spreadsheet\DefaultServiceRequest;
 use Google\Spreadsheet\ServiceRequestFactory;
 
 abstract class SpreadsheetController extends Controller
 {
     /**
-     * @var Spreadsheets
+     * @var SpreadsheetService
      */
     protected $spreadsheets;
 

@@ -16,7 +16,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppShed\Extensions\SpreadsheetBundle\Entity\Doc;
-use ZendGData\Spreadsheets\DocumentQuery;
 
 /**
  * @Route("/spreadsheet/write", service="app_shed_extensions_spreadsheet.controller.write")
@@ -197,7 +196,7 @@ class WriteController extends SpreadsheetController
     /**
      * @param $key
      * @throws SpreadsheetNotFoundException
-     * @return \ZendGData\Spreadsheets\WorksheetEntry
+     * @return \Google\Spreadsheet\Spreadsheet
      */
     protected function getDocument($key)
     {
