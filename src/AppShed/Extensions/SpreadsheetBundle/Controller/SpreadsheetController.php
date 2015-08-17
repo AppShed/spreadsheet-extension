@@ -72,7 +72,7 @@ abstract class SpreadsheetController extends Controller
     /**
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
      */
-    protected function getDoctrine()
+    public function getDoctrine()
     {
         return $this->doctrine;
     }
