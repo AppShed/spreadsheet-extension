@@ -2,55 +2,22 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <parameters>
-        <parameter key="app_shed_extensions_spreadsheet.google_username"></parameter>
-        <parameter key="app_shed_extensions_spreadsheet.google_password"></parameter>
-    </parameters>
-
     <services>
         <service id="app_shed_extensions_spreadsheet.controller.read"
                  class="AppShed\Extensions\SpreadsheetBundle\Controller\ReadController">
-            <argument type="service" id="app_shed_extensions_spreadsheet.spreadsheet_adapter"/>
             <argument type="service" id="doctrine"/>
             <argument type="service" id="logger"/>
             <argument type="service" id="geoService"/>
+            <argument>%google_client_id%</argument>
+            <argument>%google_client_email%</argument>
         </service>
         <service id="app_shed_extensions_spreadsheet.controller.write"
                  class="AppShed\Extensions\SpreadsheetBundle\Controller\WriteController">
-            <argument type="service" id="app_shed_extensions_spreadsheet.spreadsheet_adapter"/>
             <argument type="service" id="doctrine"/>
             <argument type="service" id="logger"/>
             <argument type="service" id="geoService"/>
-        </service>
-        <service id="app_shed_extensions_spreadsheet.spreadsheet_adapter"
-                 class="ZendGData\Spreadsheets">
-            <argument type="service" id="app_shed_extensions_spreadsheet.google_client"/>
-        </service>
-        <service id="app_shed_extensions_spreadsheet.google_client"
-                 class="ZendGData\HttpClient"
-                 factory-class="ZendGData\ClientLogin"
-                 factory-method="getHttpClient">
-            <argument>%app_shed_extensions_spreadsheet.google_username%</argument>
-            <argument>%app_shed_extensions_spreadsheet.google_password%</argument>
-            <argument type="constant">ZendGData\Spreadsheets::AUTH_SERVICE_NAME</argument>
-            <argument type="service" id="app_shed_extensions_spreadsheet.http_client" />
-        </service>
-        <service id="app_shed_extensions_spreadsheet.http_client"
-                 class="ZendGData\HttpClient">
-            <call method="setAdapter">
-                <argument type="service" id="app_shed_extensions_spreadsheet.client_adapter" />
-            </call>
-        </service>
-        <service id="app_shed_extensions_spreadsheet.client_adapter"
-                 class="Zend\Http\Client\Adapter\Curl">
-            <call method="setCurlOption">
-                <argument type="constant">CURLOPT_SSL_VERIFYPEER</argument>
-                <argument>false</argument>
-            </call>
-            <call method="setCurlOption">
-                <argument type="constant">CURLOPT_SSL_VERIFYHOST</argument>
-                <argument>false</argument>
-            </call>
+            <argument>%google_client_id%</argument>
+            <argument>%google_client_email%</argument>
         </service>
         <service id="app_shed_extensions_spreadsheet.geo_client"
                  class="GuzzleHttp\Client"

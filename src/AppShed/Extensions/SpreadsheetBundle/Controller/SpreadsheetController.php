@@ -4,13 +4,19 @@ namespace AppShed\Extensions\SpreadsheetBundle\Controller;
 
 use AppShed\Extensions\SpreadsheetBundle\Service\GeoService;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Google\Spreadsheet\SpreadsheetFeed;
+use Google\Spreadsheet\SpreadsheetService;
+use Google_Auth_AssertionCredentials;
+use Google_Client;
 use Psr\Log\LoggerInterface;
-use ZendGData\Spreadsheets;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Google\Spreadsheet\DefaultServiceRequest;
+use Google\Spreadsheet\ServiceRequestFactory;
 
-abstract class SpreadsheetController
+abstract class SpreadsheetController extends Controller
 {
     /**
-     * @var Spreadsheets
+     * @var SpreadsheetService
      */
     protected $spreadsheets;
 
@@ -30,9 +36,34 @@ abstract class SpreadsheetController
     protected $geoService;
 
 
-    public function __construct(Spreadsheets $spreadsheets, Registry $doctrine, LoggerInterface $logger, GeoService $geoService )
+    public function __construct( Registry $doctrine, LoggerInterface $logger, GeoService $geoService, $google_client_id, $google_client_email )
     {
-        $this->spreadsheets = $spreadsheets;
+        $client = new Google_Client();
+
+        $client->setApplicationName('Spreadsheet');
+        $client->setClientId($google_client_id); //client id
+
+        $cred = new Google_Auth_AssertionCredentials(
+            $google_client_email, //email
+            ['https://spreadsheets.google.com/feeds', 'https://docs.google.com/feeds'],
+            file_get_contents(__DIR__.'/../Spreadsheet-c9b3bcd23b99.p12') //p12 file dir
+        );
+
+        $client->setAssertionCredentials($cred);
+
+        if ($client->getAuth()->isAccessTokenExpired()) {
+            $client->getAuth()->refreshTokenWithAssertion($cred);
+        }
+        $accessToken = json_decode($client->getAccessToken());
+        $accessToken = $accessToken->access_token;
+
+
+        $serviceRequest = new DefaultServiceRequest($accessToken);
+        ServiceRequestFactory::setInstance($serviceRequest);
+
+        $spreadsheetService = new SpreadsheetService();
+
+        $this->spreadsheets = $spreadsheetService;
         $this->doctrine = $doctrine;
         $this->logger = $logger;
         $this->geoService = $geoService;
@@ -41,7 +72,7 @@ abstract class SpreadsheetController
     /**
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
      */
-    protected function getDoctrine()
+    public function getDoctrine()
     {
         return $this->doctrine;
     }
@@ -55,7 +86,7 @@ abstract class SpreadsheetController
     }
 
     /**
-     * @return \ZendGData\Spreadsheets
+     * @return SpreadsheetFeed
      */
     protected function getSpreadsheets()
     {

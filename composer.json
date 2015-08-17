@@ -20,11 +20,12 @@
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
         "symfony/finder": "2.3.*",
-        "zendframework/zendgdata": "~2.0.1",
         "appshed/extension-api": "~2.0.2",
         "guzzlehttp/guzzle": "~5.0",
         "guzzlehttp/log-subscriber": "~1.0",
-        "guzzlehttp/cache-subscriber": "0.1.0"
+        "guzzlehttp/cache-subscriber": "0.1.0",
+        "google/apiclient": "1.*",
+        "asimlqt/php-google-spreadsheet-client": "2.3.*"
     },
     "scripts": {
         "post-install-cmd": [
