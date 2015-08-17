@@ -7,6 +7,9 @@ use AppShed\Remote\Element\Item\HTML;
 use AppShed\Remote\Element\Item\Text;
 use AppShed\Remote\Element\Screen\Screen;
 use AppShed\Remote\HTML\Remote;
+use Google\Spreadsheet\Spreadsheet;
+use Google\Spreadsheet\SpreadsheetFeed;
+use Google\Spreadsheet\Worksheet;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -53,23 +56,27 @@ class WriteController extends SpreadsheetController
             $action = $request->get('action', false);
 
             try {
-                $worksheet = $this->getDocument($key);
-                
-                
-                $lines = $worksheet->getContentsAsRows();
-                if (is_array($lines) && isset($lines['0']) && is_array($lines['0'])) {
-                    $titles = array_keys($lines['0']);
-                }
-                if(!is_array($titles)){
-                     $titles = array();
+                /** @var Spreadsheet $document */
+                $document = $this->getDocument($key);
+                $worksheets = $document->getWorksheets();
+                $worksheet = $worksheets[0];
+
+                if ($worksheet) {
+                    $lines = $worksheet->getListFeed()->getEntries();
+                    $titles = [];
+                    if (is_array($lines) && isset($lines[0])) {
+                        $lines = $lines[0]->getValues();
+                        $titles = array_keys($lines);
+                    }
+
+                    $doc->setUrl($url);
+                    $doc->setKey($key);
+                    $doc->setTitles($titles);
+
+                    $em->persist($doc);
+                    $em->flush();
                 }
 
-                $doc->setUrl($url);
-                $doc->setKey($key);
-                $doc->setTitles(array_unique($titles));
-
-                $em->persist($doc);
-                $em->flush();
             } catch (SpreadsheetNotFoundException $e) {
                 $this->logger->error(
                     'Spreadsheet not found',
@@ -107,6 +114,7 @@ class WriteController extends SpreadsheetController
         $secret = $request->get('identifier');
 
         $em = $this->getDoctrine()->getManager();
+        /** @var Doc $doc */
         $doc = $em->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')->findOneBy(array('itemsecret' => $secret));
 
         if (!$doc) {
@@ -128,7 +136,7 @@ class WriteController extends SpreadsheetController
             }
 
             if ($store) {
-                $doc->setTitles(array_unique($existingTitles));
+                $doc->setTitles($existingTitles);
                 $em->flush();
             }
 
@@ -139,7 +147,11 @@ class WriteController extends SpreadsheetController
             }
 
             if (count($rowData) > 0) {
-                $this->getSpreadsheets()->insertRow($rowData, $doc->getKey(), 1);
+                /** @var Spreadsheet $document */
+                $document = $this->getDocument($doc->getKey());
+                $worksheets = $document->getWorksheets();
+                $worksheet = $worksheets[0];
+                $worksheet->getListFeed()->insert($rowData);
             }
         } catch (\Exception $e) {
             $screen = new Screen('Error');
@@ -166,12 +178,17 @@ class WriteController extends SpreadsheetController
 
         $titles = array();
 
-        $worksheet = $this->getDocument($key);
-        if ($worksheet != null) {
+        /** @var Spreadsheet $document */
+        $document = $this->getDocument($key);
+        $worksheets = $document->getWorksheets();
+        $worksheet = $worksheets[0];
 
-            $lines = $worksheet->getContentsAsRows();
-            if (is_array($lines) && isset($lines['0']) && is_array($lines['0'])) {
-                $titles = array_keys($lines['0']);
+        if ($worksheet) {
+            $lines = $worksheet->getListFeed()->getEntries();
+            if (is_array($lines) && isset($lines[0])) {
+                $lines = $lines[0]->getValues();
+
+                $titles = array_keys($lines);
             }
         }
         return $titles;
@@ -184,15 +201,13 @@ class WriteController extends SpreadsheetController
      */
     protected function getDocument($key)
     {
-        $query = new DocumentQuery();
-        $query->setSpreadsheetKey($key);
-        $feed = $this->getSpreadsheets()->getWorksheetFeed($query);
+        $feed = $this->getSpreadsheets()->getSpreadsheetById($key);
 
-        if (!isset($feed[0])) {
+        if (!$feed) {
             throw new SpreadsheetNotFoundException("Failed to find spreadsheet $key");
         }
 
-        return $feed[0];
+        return $feed;
     }
 
     /**
@@ -203,8 +218,14 @@ class WriteController extends SpreadsheetController
      */
     private function addTitle($name, $key)
     {
-        $index = $this->findEmptyColumn($key);
-        $this->getSpreadsheets()->updateCell('1', $index, $name, $key);
+        /** @var Spreadsheet $document */
+        $document = $this->getDocument($key);
+        $worksheets = $document->getWorksheets();
+        $worksheet = $worksheets[0];
+        /** @var Worksheet $worksheet */
+        if ($worksheet) {
+            $cellEntry = $worksheet->getCellFeed()->createInsertionCell(1, $this->findEmptyColumn($key), $name)->update($name);
+        }
     }
 
     /**
@@ -215,13 +236,7 @@ class WriteController extends SpreadsheetController
      */
     private function findEmptyColumn($key)
     {
-        $worksheet = $this->getDocument($key);
-        $cells = $worksheet->getContentsAsCells();
-        $col = 'A';
-        while (isset($cells["{$col}1"])) {
-            $col++;
-        }
-        return ord($col) - 64;
+        return count($this->getColumnTitles($key))+1;
     }
 
     /**

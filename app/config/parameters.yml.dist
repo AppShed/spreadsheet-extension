@@ -14,5 +14,5 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    google_username:    ~
-    google_password:    ~
+    google_client_id:   '1031545240475-o73fjbf0j4gerfjj603feqr3sb142c3p.apps.googleusercontent.com'
+    google_client_email:    '1031545240475-o73fjbf0j4gerfjj603feqr3sb142c3p@developer.gserviceaccount.com'

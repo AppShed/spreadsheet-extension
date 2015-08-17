@@ -118,18 +118,19 @@ class ReadController extends SpreadsheetController
 
             //This screen will have a list of the values in A column
             $screen = new Screen($document->getTitle());
+            $worksheets = $document->getWorksheets();
+            $worksheet = $worksheets[0];
+
+            $lines = $worksheet->getListFeed()->getEntries();
 
             //For each row of the table
-            foreach ($document as $entry) {
-
+            foreach ($lines as $lineEntry) {
                 $index = true;
-                $lines = $entry->getCustom();
+
+                $lineColumns =$lineEntry->getValues();
 
                 //Each of the columns of the row
-                foreach ($lines as $customEntry) {
-
-                    $name = $customEntry->getColumnName();
-                    $value = $customEntry->getText();
+                foreach ($lineColumns as $name => $value) {
 
                     //If the name of a column ends with a '-' then we dont show it
                     if (((strlen($name) - 1) == strpos($name, '-')) == false) {
@@ -188,16 +189,20 @@ class ReadController extends SpreadsheetController
 
     private function getRowTitles($key)
     {
-        $doc = $this->getDocument($key);
         $titles = array();
 
-        foreach ($doc as $entry) {
-            foreach ($entry->getCustom() as $customEntry) {
-                $titles[] = $customEntry->getColumnName();
-            }
-            break;
-        }
+        $document = $this->getDocument($key);
+        $worksheets = $document->getWorksheets();
+        $worksheet = $worksheets[0];
 
+        if ($worksheet) {
+            $lines = $worksheet->getListFeed()->getEntries();
+            if (is_array($lines) && isset($lines[0])) {
+                $lines = $lines[0]->getValues();
+
+                $titles = array_keys($lines);
+            }
+        }
         return $titles;
     }
 
@@ -208,7 +213,9 @@ class ReadController extends SpreadsheetController
         if ($filter) {
             $query->setSpreadsheetQuery($filter);
         }
-        $listFeed = $this->getSpreadsheets()->getListFeed($query);
+
+        $listFeed = $this->getSpreadsheets()->getSpreadsheetById($key);
+
         return $listFeed;
     }
 
