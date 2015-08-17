@@ -10,7 +10,6 @@ use AppShed\Remote\HTML\Remote;
 use Google\Spreadsheet\Spreadsheet;
 use Google\Spreadsheet\SpreadsheetFeed;
 use Google\Spreadsheet\Worksheet;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,15 +33,15 @@ class WriteController extends SpreadsheetController
         $secret = $request->get('identifier');
 
         $em = $this->getDoctrine()->getManager();
-        $doc = $em->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')->findOneBy(array('itemsecret' => $secret));
+        $doc = $em->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')->findOneBy(['itemsecret' => $secret]);
 
 
         if (is_null($doc)) {
             $doc = new Doc();
             $doc->setKey('');
             $doc->setUrl('');
-            $doc->setTitles(array());
-            $doc->setFilters(array());
+            $doc->setTitles([]);
+            $doc->setFilters([]);
             $doc->setItemsecret($secret);
             $doc->setDate(new \DateTime());
         }
@@ -84,18 +83,18 @@ class WriteController extends SpreadsheetController
                     ]
                 );
 
-                return array(
+                return [
                     'doc' => $doc,
                     'action' => $action,
                     'error' => 'Could not access the document'
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'doc' => $doc,
             'action' => $action
-        );
+        ];
     }
 
     /**
@@ -114,7 +113,7 @@ class WriteController extends SpreadsheetController
 
         $em = $this->getDoctrine()->getManager();
         /** @var Doc $doc */
-        $doc = $em->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')->findOneBy(array('itemsecret' => $secret));
+        $doc = $em->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')->findOneBy(['itemsecret' => $secret]);
 
         if (!$doc) {
             $screen = new Screen('Error');
@@ -175,7 +174,7 @@ class WriteController extends SpreadsheetController
     private function getColumnTitles($key)
     {
 
-        $titles = array();
+        $titles = [];
 
         /** @var Spreadsheet $document */
         $document = $this->getDocument($key);

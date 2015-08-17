@@ -34,14 +34,14 @@ class Doc
     }
 
     /**
-     * @var Date
+     * @var \DateTime
      * @ORM\Column(name="date", type="datetime", nullable=true)
      */
     protected $date;
 
     /**
      * Get Date
-     * @return Date
+     * @return \DateTime
      */
     public function getDate()
     {
@@ -51,8 +51,8 @@ class Doc
     /**
      * Set Date
      *
-     * @param string $Date
-     * @return Guest
+     * @param \DateTime $x
+     * @return Doc
      */
     public function setDate($x)
     {
@@ -61,25 +61,25 @@ class Doc
     }
 
     /**
-     * @var titles
+     * @var string[]
      * @ORM\Column(name="titles", type="array",  nullable=true)
      */
     protected $titles;
 
     /**
      * Get titles
-     * @return Titles
+     * @return string[]
      */
     public function getTitles()
     {
 
-        return is_array($this->titles) ? $this->titles : array();
+        return is_array($this->titles) ? $this->titles : [];
     }
 
     /**
      * Set titles
      *
-     * @param string $titles
+     * @param string[] $titles
      * @return Doc
      */
     public function setTitles($titles)
@@ -89,14 +89,14 @@ class Doc
     }
 
     /**
-     * @var url
+     * @var string
      * @ORM\Column(name="url", type="string", length=355, nullable=true)
      */
     protected $url;
 
     /**
      * Get url
-     * @return Url
+     * @return string
      */
     public function getUrl()
     {
@@ -116,7 +116,7 @@ class Doc
     }
 
     /**
-     * @var address
+     * @var string
      * @ORM\Column(name="address", type="string", length=255, nullable=true)
      */
     protected $address;
@@ -133,7 +133,7 @@ class Doc
     /**
      * Set Address
      *
-     * @param string address
+     * @param string $address
      * @return Doc
      */
     public function setAddress($address)
@@ -143,14 +143,14 @@ class Doc
     }
 
     /**
-     * @var key
+     * @var string
      * @ORM\Column(name="dockey", type="string", length=255, nullable=true)
      */
     protected $key;
 
     /**
      * Get key
-     * @return Key
+     * @return string
      */
     public function getKey()
     {
@@ -170,14 +170,14 @@ class Doc
     }
 
     /**
-     * @var itemsecret
+     * @var string
      * @ORM\Column(name="itemsecret", type="string", length=255, nullable=true)
      */
     protected $itemsecret;
 
     /**
      * Get itemsecret
-     * @return Itemsecret
+     * @return string
      */
     public function getItemsecret()
     {
@@ -197,24 +197,24 @@ class Doc
     }
 
     /**
-     * @var filters
+     * @var string[]
      * @ORM\Column(name="filters", type="array")
      */
     protected $filters;
 
     /**
      * Get filters
-     * @return Filters
+     * @return string[]
      */
     public function getFilters()
     {
-        return is_array($this->filters) ? $this->filters : array();
+        return is_array($this->filters) ? $this->filters : [];
     }
 
     /**
      * Set filters
      *
-     * @param string $filters
+     * @param string[] $filters
      * @return Doc
      */
     public function setFilters($filters)
