@@ -11,4 +11,4 @@ before_script:
     - composer selfupdate
     - composer install --prefer-source
 
-script: ./bin/phpunit
+script: ./bin/phpunit -c app
