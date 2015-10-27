@@ -61,9 +61,7 @@ abstract class SpreadsheetController extends Controller
         $serviceRequest = new DefaultServiceRequest($accessToken);
         ServiceRequestFactory::setInstance($serviceRequest);
 
-        $spreadsheetService = new SpreadsheetService();
-
-        $this->spreadsheets = $spreadsheetService;
+        $this->spreadsheets = new SpreadsheetService();
         $this->doctrine = $doctrine;
         $this->logger = $logger;
         $this->geoService = $geoService;

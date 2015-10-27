@@ -109,17 +109,14 @@ class ReadController extends SpreadsheetController
 
         try {
 
-            $document = $this->getDocument(
-                $doc->getKey(),
-                $this->getFilterString($doc->getFilters(), $request)
-            );
+            $document = $this->getDocument($doc->getKey());
 
             //This screen will have a list of the values in A column
             $screen = new Screen($document->getTitle());
             $worksheets = $document->getWorksheets();
             $worksheet = $worksheets[0];
 
-            $lines = $worksheet->getListFeed()->getEntries();
+            $lines = $worksheet->getListFeed(["sq" => $this->getFilterString($doc->getFilters(), $request)])->getEntries();
 
             //For each row of the table
             foreach ($lines as $lineEntry) {
@@ -205,18 +202,9 @@ class ReadController extends SpreadsheetController
         return $titles;
     }
 
-    private function getDocument($key, $filter = null)
+    private function getDocument($key)
     {
-//        $query = new ListQuery();
-//        $query->setSpreadsheetKey($key);
-//        if ($filter) {
-//            $query->setSpreadsheetQuery($filter);
-//        }
-
-        // need to test it where is used
-
         $listFeed = $this->getSpreadsheets()->getSpreadsheetById($key);
-
         return $listFeed;
     }
 
