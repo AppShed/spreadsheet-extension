@@ -17,15 +17,14 @@ use AppShed\Extensions\SpreadsheetBundle\Entity\Doc;
 /**
  * @Route("/spreadsheet/read", service="app_shed_extensions_spreadsheet.controller.read")
  */
-class ReadController extends SpreadsheetController
-{
+class ReadController extends SpreadsheetController {
+
     /**
      * @Route("/edit")
      * @Route("/edit/")
      * @Template()
      */
-    public function indexAction(Request $request)
-    {
+    public function indexAction(Request $request) {
         $action = '';
         $secret = $request->get('identifier');
         $em = $this->getDoctrine()->getManager();
@@ -85,8 +84,7 @@ class ReadController extends SpreadsheetController
      * @Route("/document")
      * @Route("/document/")
      */
-    public function documentAction(Request $request)
-    {
+    public function documentAction(Request $request) {
         if (Remote::isOptionsRequest()) {
             return Remote::getCORSSymfonyResponse();
         }
@@ -95,9 +93,9 @@ class ReadController extends SpreadsheetController
 
         /** @var Doc $doc */
         $doc = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')
-            ->findOneBy(['itemsecret' => $secret]);
+                ->getManager()
+                ->getRepository('AppShedExtensionsSpreadsheetBundle:Doc')
+                ->findOneBy(['itemsecret' => $secret]);
 
         if (!$doc) {
             $screen = new Screen('Error');
@@ -116,13 +114,18 @@ class ReadController extends SpreadsheetController
             $worksheets = $document->getWorksheets();
             $worksheet = $worksheets[0];
 
-            $lines = $worksheet->getListFeed(["sq" => $this->getFilterString($doc->getFilters(), $request)])->getEntries();
+            $filters = $this->getFilterString($doc->getFilters(), $request);
+            if (!empty($filters)) {
+                $lines = $worksheet->getListFeed(["sq" => $filters])->getEntries();
+            } else {
+                $lines = $worksheet->getListFeed()->getEntries();
+            }
 
             //For each row of the table
             foreach ($lines as $lineEntry) {
                 $index = true;
 
-                $lineColumns =$lineEntry->getValues();
+                $lineColumns = $lineEntry->getValues();
 
                 //Each of the columns of the row
                 foreach ($lineColumns as $name => $value) {
@@ -141,7 +144,7 @@ class ReadController extends SpreadsheetController
                             if (!empty($value)) {
                                 $map = false;
 
-                                if ($name == strtolower($address) ) {
+                                if ($name == strtolower($address)) {
 
                                     $geo = $this->geoService->getGeo($value);
 
@@ -173,17 +176,15 @@ class ReadController extends SpreadsheetController
             $screen->addChild(new Text($e->getMessage()));
 
             $this->logger->error(
-                'Problem reading a spreadsheet',
-                [
-                    'exception' => $e
-                ]
+                    'Problem reading a spreadsheet', [
+                'exception' => $e
+                    ]
             );
             return (new Remote($screen))->getSymfonyResponse();
         }
     }
 
-    private function getRowTitles($key)
-    {
+    private function getRowTitles($key) {
         $titles = [];
 
         $document = $this->getDocument($key);
@@ -198,18 +199,16 @@ class ReadController extends SpreadsheetController
                 $titles = array_keys($lines);
             }
         }
-        
+
         return $titles;
     }
 
-    private function getDocument($key)
-    {
+    private function getDocument($key) {
         $listFeed = $this->getSpreadsheets()->getSpreadsheetById($key);
         return $listFeed;
     }
 
-    private function getFilterString($filter, Request $request)
-    {
+    private function getFilterString($filter, Request $request) {
         $filters = [];
 
         foreach ($filter as $option) {
@@ -233,8 +232,7 @@ class ReadController extends SpreadsheetController
         return $str;
     }
 
-    private function getAroundMeQuery($distance, Request $request)
-    {
+    private function getAroundMeQuery($distance, Request $request) {
         $center = [
             'lat' => $request->query->get('userlat', 0),
             'lng' => $request->query->get('userlng', 0)
@@ -248,8 +246,7 @@ class ReadController extends SpreadsheetController
         return implode(' AND ', $filters);
     }
 
-    private function getBounds($center, $radius)
-    {
+    private function getBounds($center, $radius) {
         $conv = $this->getConv($center);
         $bounces = [];
 
@@ -264,18 +261,16 @@ class ReadController extends SpreadsheetController
         return $bounces;
     }
 
-    private function distanceOrt($position, $point, $limit = false)
-    {
+    private function distanceOrt($position, $point, $limit = false) {
         $ra = M_PI / 180;
         $b = $position['lat'] * $ra;
         $c = $point['lat'] * $ra;
         $f = (2 * asin(
-                    sqrt(
-                        pow(sin(($b - $c) / 2), 2) + cos($b) * cos($c) * pow(
-                            sin(($position['lng'] * $ra - $point['lng'] * $ra) / 2),
-                            2
+                        sqrt(
+                                pow(sin(($b - $c) / 2), 2) + cos($b) * cos($c) * pow(
+                                        sin(($position['lng'] * $ra - $point['lng'] * $ra) / 2), 2
+                                )
                         )
-                    )
                 )) * 6378137;
 
         if ($limit) {
@@ -285,19 +280,16 @@ class ReadController extends SpreadsheetController
         }
     }
 
-    private function getConv($center)
-    {
+    private function getConv($center) {
         return [
             'lat' => $this->distanceOrt(
-                    $center,
-                    ['lat' => ($center['lat'] + 0.1), 'lng' => ($center['lng'])]
-                ) / 100,
+                    $center, ['lat' => ($center['lat'] + 0.1), 'lng' => ($center['lng'])]
+            ) / 100,
             'lng' => $this->distanceOrt($center, ['lat' => $center['lat'], 'lng' => ($center['lng'] + 0.1)]) / 100
         ];
     }
 
-    private function getPointPosition($conv, $center, $r, $angle)
-    {
+    private function getPointPosition($conv, $center, $r, $angle) {
         $r = $r / 1000;
         return [
             'lat' => $center['lat'] + ($r / $conv['lat'] * cos($angle * M_PI / 180)),
@@ -305,4 +297,5 @@ class ReadController extends SpreadsheetController
             'angle' => $angle
         ];
     }
+
 }
